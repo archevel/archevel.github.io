@@ -108,3 +108,7 @@ haproxy -f /etc/haproxy.conf
 ```
 
 All in all this feels like a nicer aproach since it uses plain dns to resolve the services. This allows services to be restarted in contrast with the previous solution where each service's IP was "hard coded" when starting the haproxy container. In addition if we end up storing the appservers list in consul or etcd there is very little change needed. Finaly if we switch to using and `overlay` network spanning multiple docker hosts this solution will still work without modification!
+
+[ha-docker-hack]: http://archevel.github.io/docker/docker-compose/haproxy/2016/02/16/containers-and-haproxy.html
+[docker-networks]: https://docs.docker.com/engine/userguide/networking/dockernetworks/#user-defined-networks
+[confd]: http://www.confd.io/
