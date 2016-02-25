@@ -4,6 +4,7 @@ title:  "Automatically route requests to containers linked with Haproxy"
 date:   2016-02-16 07:59:54 +0000
 categories: docker docker-compose haproxy 
 ---
+___Update: My [next post][haproxy-docker-revisited] illustrates how to do this when using the new docker networking capabilities. It is arguably a nicer approach!___
 
 If you have multiple containers running on a server that expose webbapps you might want to consider putting a proxy in front of them. One way to do that is to use [Haproxy][haproxy]. Getting started with it if you are already using docker is simple since there's [an official docker image for it][haproxy-image]. For small deployments docker-compose is a nice way to organise the containers. As an example we'll use this compose file:
 
@@ -126,3 +127,4 @@ Now we just instruct the container that it should start haproxy with the generat
 [haproxy-image]: https://hub.docker.com/_/haproxy/
 [haproxy-config]: http://cbonte.github.io/haproxy-dconv/configuration-1.6.html
 [configure-and-start.sh]: https://gist.github.com/archevel/48db152b85ad643bf33a
+[haproxy-docker-revisited]: https://archevel.github.io/docker/docker-compose/haproxy/confd/2016/02/25/haproxy-and-docker-a-cleaner-approach.html
