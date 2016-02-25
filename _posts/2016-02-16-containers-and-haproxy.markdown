@@ -8,7 +8,7 @@ ___Update: My [next post][haproxy-docker-revisited] illustrates how to do this w
 
 If you have multiple containers running on a server that expose webbapps you might want to consider putting a proxy in front of them. One way to do that is to use [Haproxy][haproxy]. Getting started with it if you are already using docker is simple since there's [an official docker image for it][haproxy-image]. For small deployments docker-compose is a nice way to organise the containers. As an example we'll use this compose file:
 
-```
+```YAML
 version: '2'
 
 services:
@@ -29,7 +29,7 @@ services:
 
 Genie is a pyhon flask applicatin and proxy is our haproxy container. Ideally we'd want haproxy to automatically detect the genie container and route HTTP requests to it. We will start with this haproxy config file (found at `/etc/haproxy.conf.tmpl` in the container): 
 
-```
+```Shell
 global
     maxconn 256
 
@@ -49,7 +49,7 @@ Here we basically have a frontend that bound to port 80 and that currently will 
 
 This config lacks any backends so we need to add them when we bring up the haproxy container. To achieve this we'll use the fact that docker's bridged network adds entries to the linking container's `/etc/hosts` file. So let's put our bash hats on!
 
-```
+```Shell
 #!/bin/bash
 set -e
 
@@ -61,7 +61,7 @@ echo "#####"
 ```
 This reads the .tmpl file and echos the content. `tee` is a nice program that takes stdin and push it both to stdout and to an outfile. Next we grep the relevant host entries from the `/etc/hosts` file 
 
-```
+```Shell
 echo 
 echo "Grabing docker containers from the hostfile (using docker's subnet)"
 HOSTS=$(grep -P "^172.17.[.0-9]+\t[^ _]+ .+$" /etc/hosts)
@@ -74,7 +74,7 @@ The grep command here finds the rows that are on the docker subnet (172.17.x.y) 
 
 Btw, all the echoing is only a nice to have. Since this is run on startup of the haproxy container it will show up in the docker logs which makes it easier to debug. Next up: sed-fu! 
 
-```
+```Shell
 echo
 echo "Using sed to create mappings entries for the found hosts"
 MAPPINGS=$(sed "s/\(^[.0-9]*\)\t\([^ _]*\) .*$/    use_backend \2 if \{ path_beg \/\2\/ \}\n/g" <<< "$HOSTS")
@@ -85,19 +85,19 @@ echo "#####"
 ```
 Here sed is used with the input from the hosts we grepped out earlier we use it to produce mappings which are then appended to  the haproxy.conf file again using `tee`. This transforms a host entry like:
 
-```
+```Shell
 172.17.0.3	genie 0c984672792c labs_genie_1
 ```
 
 to:
 
-```
+```Shell
     use_backend genie if { path_beg /genie/ }
 ```
 
 So if a path start with the name of the container we use the backend for that container, which we will generate next!
 
-```
+```Shell
 echo 
 echo "Using sed to create the backend entries for the found hosts"
 BACKENDS=$(sed "s/\(^[.0-9]*\)\t\([^ _]*\) .*$/backend \2 \n    reqrep ^([^\\\ ]*\\\ \/)\2[\/]?(.*)     \\\1\\\2\n    server \2 \1:5000 maxconn 32\n/g" <<< "$HOSTS")
@@ -109,13 +109,13 @@ echo "#####"
 
 The sed commands search part above is identical to the previous one (we still want the simplest container names and their IP). The replace part is a bit more involved and easy to get wrong. There's a bunch of escaping mixed in with the replacements and we also create a new regex to boot! At this point you might appreciate why I've been using `tee` ;) In any case the sed command would transforms the host entry:
 
-```
+```Shell
 172.17.0.3	genie 0c984672792c labs_genie_1
 ```
 
 to:
 
-```
+```Shell
 backend genie 
      reqrep ^([^\ ]*\ /)genie[/]?(.*)     \1\2
      server genie 172.17.0.3:5000 maxconn 32
