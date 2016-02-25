@@ -67,6 +67,7 @@ frontend http-in
 {{ $nodes := split (getenv "appservers") ":" }}{{range $nodes}}
     use_backend {{.}}_backend if { path_beg /{{.}}/ }
 {{end}}
+
 {{ $nodes := split (getenv "appservers") ":" }}{{range $nodes}}
 backend {{.}}_backend
      reqrep ^([^\ ]*\ /){{.}}[/]?(.*)     \1\2
