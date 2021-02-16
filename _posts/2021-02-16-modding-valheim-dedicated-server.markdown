@@ -51,12 +51,14 @@ private bool EverybodyIsTryingToSleep()
     {
         while (enumerator.MoveNext())
         {
+            // This now checks if ANYONE is in bed
             if (enumerator.Current.GetBool("inBed", false))
             {
                 return true;
             }
         }
     }
+    // If no one is in bed we return false
     return false;
 }
 ```
