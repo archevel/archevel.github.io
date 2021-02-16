@@ -2,10 +2,10 @@
 layout: post
 title:  "Adding single person sleep to multiplayer Valheim server"
 date:   2021-02-16 13:00:00 +0000
-categories: docker docker-compose haproxy 
+categories: valheim modding 
 ---
 
-Disclaimer: I give NO guarantees that the below doesn't mess up you Valheim game or characters!
+__Disclaimer: I give NO guarantees that the below doesn't mess up you Valheim game or characters!__
 
 Like many others I recently stared playing Valheim with a few friends. It is a nice co-op PvE game in a viking setting. However, one slight anoyance was the inability of triggering sleep unless ALL players on the server got into bed. So I decided to explore the code a bit using disassembly and see if I could modify the behaviour. I downloaded the Valheim dedicated server and installed [dnSpy](https://github.com/dnSpy/dnSpy). Using dnSpy I then opened the assembly `assembly_valheim.dll` which on my windows machine was found at `C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server\valheim_server_Data\Managed` (this will depend a bit on where you decide to install the Valheim dedicated server).
 
